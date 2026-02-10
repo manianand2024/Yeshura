@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yeshura | SOC 2 Theory & Practice Lab</title>
+    <title>Yeshura | Real-time SOC 2 Auditor</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #1e293b; }
-        .practice-card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #e2e8f0; }
-        .control-row:hover { background-color: #f8fafc; }
-        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-        .gap-alert { background-color: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; }
-        .pass-check { background-color: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .stat-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; transition: all 0.3s; }
+        .row-active { background-color: #f0f9ff !important; border-left: 4px solid #0ea5e9; }
+        .btn-save { background-color: #0ea5e9; color: white; padding: 6px 12px; rounded: 6px; font-weight: 600; font-size: 12px; }
+        .btn-save:hover { background-color: #0284c7; }
+        th { text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; color: #64748b; padding: 12px; }
     </style>
 </head>
 <body>
@@ -24,146 +24,161 @@
     <script type="text/babel">
         const { useState } = React;
 
-        // IMPORTED REAL DATA: All 36 Controls from your App.js source
-        const realSoc2Controls = [
-            { id: '1', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC1.1', controlDescription: 'The entity demonstrates a commitment to integrity and ethical values.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: 'Develop Code of Conduct', responsibleOwner: 'HR', targetDate: '', notes: 'Theory: Focuses on the "Tone at the Top".' },
-            { id: '2', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC1.2', controlDescription: 'The board of directors demonstrates independence from management and exercises oversight of internal control.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '3', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC1.3', controlDescription: 'Management establishes, with board oversight, structures, reporting lines, and appropriate authorities and responsibilities.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '4', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC1.4', controlDescription: 'The entity demonstrates a commitment to attract, develop, and retain competent individuals.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '5', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC1.5', controlDescription: 'The entity holds individuals accountable for their internal control responsibilities.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '6', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC2.1', controlDescription: 'The entity specifies objectives with sufficient clarity to enable risk assessment.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '7', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC3.1', controlDescription: 'The entity identifies and assesses risks to its objectives.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '8', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC3.2', controlDescription: 'The entity identifies and assesses changes that could impact internal control.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '9', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC3.3', controlDescription: 'The entity considers the potential for fraud in assessing risks.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '10', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC3.4', controlDescription: 'The entity identifies and assesses risks arising from business partners.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '11', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC3.5', controlDescription: 'The entity identifies and assesses risks from external threats.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '12', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC4.1', controlDescription: 'The entity selects and develops control activities to mitigate risks.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '13', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC4.2', controlDescription: 'The entity deploys control activities through policies and procedures.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '14', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC5.1', controlDescription: 'The entity uses quality information to support internal control.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '15', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC6.1', controlDescription: 'The entity internally communicates information for internal control.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '16', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC6.2', controlDescription: 'The entity communicates with external parties regarding internal control.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '17', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC6.3', controlDescription: 'The entity monitors the system of internal control.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '18', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC7.1', controlDescription: 'The entity evaluates and communicates control deficiencies timely.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '19', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC8.1', controlDescription: 'The entity implements logical access security.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '20', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC9.1', controlDescription: 'The entity restricts physical access.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '21', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC10.1', controlDescription: 'The entity protects against system failures.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '22', domain: 'Security', trustServiceCriteria: 'Common Criteria', controlID: 'CC11.1', controlDescription: 'The entity identifies and mitigates vulnerabilities.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '23', domain: 'Availability', trustServiceCriteria: 'Availability Criteria', controlID: 'A1.1', controlDescription: 'The entity implements procedures for availability.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '24', domain: 'Availability', trustServiceCriteria: 'Availability Criteria', controlID: 'A1.2', controlDescription: 'The entity monitors components for anomalies and incidents.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '25', domain: 'Processing Integrity', trustServiceCriteria: 'Processing Integrity Criteria', controlID: 'PI1.1', controlDescription: 'The entity defines processing integrity objectives.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '26', domain: 'Processing Integrity', trustServiceCriteria: 'Processing Integrity Criteria', controlID: 'PI1.2', controlDescription: 'The entity prevents or detects processing errors.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '27', domain: 'Confidentiality', trustServiceCriteria: 'Confidentiality Criteria', controlID: 'C1.1', controlDescription: 'The entity identifies and maintains confidential information.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '28', domain: 'Confidentiality', trustServiceCriteria: 'Confidentiality Criteria', controlID: 'C1.2', controlDescription: 'The entity disposes of confidential information.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '29', domain: 'Privacy', trustServiceCriteria: 'Privacy Criteria', controlID: 'P1.1', controlDescription: 'The entity provides notice about privacy practices.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '30', domain: 'Privacy', trustServiceCriteria: 'Privacy Criteria', controlID: 'P2.1', controlDescription: 'The entity communicates choices regarding personal information.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '31', domain: 'Privacy', trustServiceCriteria: 'Privacy Criteria', controlID: 'P3.1', controlDescription: 'The entity collects personal information with consent.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '32', domain: 'Privacy', trustServiceCriteria: 'Privacy Criteria', controlID: 'P4.1', controlDescription: 'The entity limits use and retention of personal information.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '33', domain: 'Privacy', trustServiceCriteria: 'Privacy Criteria', controlID: 'P5.1', controlDescription: 'The entity ensures personal information is accurate.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '34', domain: 'Privacy', trustServiceCriteria: 'Privacy Criteria', controlID: 'P6.1', controlDescription: 'The entity implements safeguards for personal information.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '35', domain: 'Privacy', trustServiceCriteria: 'Privacy Criteria', controlID: 'P7.1', controlDescription: 'The entity provides access and correction rights.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' },
-            { id: '36', domain: 'Privacy', trustServiceCriteria: 'Privacy Criteria', controlID: 'P8.1', controlDescription: 'The entity monitors compliance with privacy policies.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, remediationPlan: '', responsibleOwner: '', targetDate: '', notes: '' }
+        const initialSOC2Data = [
+            { id: '1', domain: 'Security', trustServiceCriteria: 'CC1.1', controlDescription: 'The entity demonstrates a commitment to integrity and ethical values.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, fileName: '' },
+            { id: '2', domain: 'Security', trustServiceCriteria: 'CC1.2', controlDescription: 'The board demonstrates independence and exercises oversight.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, fileName: '' },
+            { id: '3', domain: 'Security', trustServiceCriteria: 'CC1.3', controlDescription: 'Management establishes reporting lines and authorities.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, fileName: '' },
+            { id: '4', domain: 'Availability', trustServiceCriteria: 'A1.1', controlDescription: 'The entity maintains and monitors system availability.', currentStatus: 'No', evidenceAvailable: false, gapIdentified: true, fileName: '' }
         ];
 
-        function App() {
-            const [controls, setControls] = useState(realSoc2Controls);
-            const [filter, setFilter] = useState('All');
+        // SUB-COMPONENT: Single Row for Inline Editing
+        const ControlRow = ({ control, onSave }) => {
+            const [localData, setLocalData] = useState({...control});
+            const [isDirty, setIsDirty] = useState(false);
 
-            // Audit Logic from ControlsController.cs
-            const updateAudit = (id, field, value) => {
-                setControls(prev => prev.map(c => {
-                    if (c.id === id) {
-                        const updated = { ...c, [field]: value };
-                        // Gap is identified if Status is No OR Evidence is not available
-                        updated.gapIdentified = updated.currentStatus === 'No' || !updated.evidenceAvailable;
-                        return updated;
-                    }
-                    return c;
-                }));
+            const handleChange = (field, value) => {
+                setLocalData(prev => ({ ...prev, [field]: value }));
+                setIsDirty(true);
             };
 
-            const filteredControls = filter === 'All' ? controls : controls.filter(c => c.domain === filter);
-            const gapCount = controls.filter(c => c.gapIdentified).length;
+            const handleFileChange = (e) => {
+                const file = e.target.files[0];
+                if(file) {
+                    setLocalData(prev => ({ ...prev, fileName: file.name, evidenceAvailable: true }));
+                    setIsDirty(true);
+                }
+            };
+
+            const triggerSave = () => {
+                onSave(localData);
+                setIsDirty(false);
+            };
 
             return (
-                <div className="max-w-6xl mx-auto py-10 px-6">
-                    <header className="mb-10 text-center">
-                        <h1 className="text-4xl font-extrabold text-blue-900 mb-2">Yeshura SOC 2 Theory Lab</h1>
-                        <p className="text-slate-500">Practice Audit Gap Analysis with Real Trust Services Criteria</p>
+                <tr className={`border-b border-slate-100 transition-colors ${isDirty ? 'row-active' : 'hover:bg-slate-50'}`}>
+                    <td className="p-4 font-bold text-sky-600 font-mono text-sm">{localData.trustServiceCriteria}</td>
+                    <td className="p-4 text-sm text-slate-600 max-w-xs">{localData.controlDescription}</td>
+                    <td className="p-4">
+                        <select 
+                            value={localData.currentStatus}
+                            onChange={(e) => handleChange('currentStatus', e.target.value)}
+                            className="text-sm border border-slate-300 rounded p-1 focus:ring-2 focus:ring-sky-500 outline-none"
+                        >
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </td>
+                    <td className="p-4">
+                        <div className="flex flex-col gap-1">
+                            <input 
+                                type="file" 
+                                id={`file-${localData.id}`} 
+                                className="hidden" 
+                                onChange={handleFileChange}
+                            />
+                            <label 
+                                htmlFor={`file-${localData.id}`} 
+                                className="text-[10px] cursor-pointer bg-slate-100 border border-slate-300 px-2 py-1 rounded text-center hover:bg-slate-200"
+                            >
+                                {localData.fileName ? '📎 ' + localData.fileName : 'Attach Evidence'}
+                            </label>
+                        </div>
+                    </td>
+                    <td className="p-4 text-center">
+                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${localData.gapIdentified ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
+                            {localData.gapIdentified ? 'GAP' : 'PASS'}
+                        </span>
+                    </td>
+                    <td className="p-4">
+                        <button 
+                            onClick={triggerSave}
+                            disabled={!isDirty}
+                            className={`w-full px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${isDirty ? 'bg-sky-500 text-white' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
+                        >
+                            Save Row
+                        </button>
+                    </td>
+                </tr>
+            );
+        };
+
+        function App() {
+            const [controls, setControls] = useState(initialSOC2Data);
+
+            const handleRowUpdate = (updatedRow) => {
+                // Gap identification logic from ControlsController.cs
+                const hasGap = updatedRow.currentStatus === 'No' || !updatedRow.evidenceAvailable;
+                
+                setControls(prev => prev.map(c => 
+                    c.id === updatedRow.id ? { ...updatedRow, gapIdentified: hasGap } : c
+                ));
+            };
+
+            const total = controls.length;
+            const gaps = controls.filter(c => c.gapIdentified).length;
+            const readiness = Math.round(((total - gaps) / total) * 100);
+
+            return (
+                <div className="max-w-6xl mx-auto py-12 px-6">
+                    <header className="mb-10 flex justify-between items-end">
+                        <div>
+                            <h1 className="text-3xl font-black text-slate-900 tracking-tight">YESHURA <span className="text-sky-500 italic">Audit Lab</span></h1>
+                            <p className="text-slate-500 mt-1">Real-time SOC 2 Control Verification</p>
+                        </div>
+                        <div className="text-right">
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Instance Status</span>
+                            <div className="flex items-center gap-2 justify-end">
+                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                <span className="text-sm font-semibold">Active Session</span>
+                            </div>
+                        </div>
                     </header>
 
-                    {/* Readiness Stats */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="practice-card p-6 border-l-4 border-blue-600">
-                            <h3 className="text-sm font-bold text-slate-400 uppercase">Total Controls</h3>
-                            <p className="text-3xl font-black">{controls.length}</p>
+                    {/* Dashboard Stats */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                        <div className="stat-card">
+                            <p className="text-sm font-bold text-slate-400 uppercase">Readiness Score</p>
+                            <h2 className="text-4xl font-black mt-1">{readiness}%</h2>
+                            <div className="w-full bg-slate-100 h-2 mt-4 rounded-full overflow-hidden">
+                                <div className="bg-sky-500 h-full transition-all duration-500" style={{width: `${readiness}%`}}></div>
+                            </div>
                         </div>
-                        <div className="practice-card p-6 border-l-4 border-red-500">
-                            <h3 className="text-sm font-bold text-slate-400 uppercase">Identified Gaps</h3>
-                            <p className="text-3xl font-black text-red-600">{gapCount}</p>
+                        <div className="stat-card">
+                            <p className="text-sm font-bold text-slate-400 uppercase">Critical Gaps</p>
+                            <h2 className={`text-4xl font-black mt-1 ${gaps > 0 ? 'text-red-500' : 'text-green-500'}`}>{gaps}</h2>
+                            <p className="text-xs text-slate-400 mt-4 italic">Action required for compliance</p>
                         </div>
-                        <div className="practice-card p-6 border-l-4 border-green-500">
-                            <h3 className="text-sm font-bold text-slate-400 uppercase">Compliance Readiness</h3>
-                            <p className="text-3xl font-black text-green-600">{Math.round(((controls.length - gapCount) / controls.length) * 100)}%</p>
+                        <div className="stat-card">
+                            <p className="text-sm font-bold text-slate-400 uppercase">Controls Verified</p>
+                            <h2 className="text-4xl font-black mt-1 text-sky-600">{total - gaps} / {total}</h2>
+                            <p className="text-xs text-slate-400 mt-4 italic">Evidence-backed controls</p>
                         </div>
                     </div>
 
-                    {/* Filter Bar */}
-                    <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-                        {['All', 'Security', 'Availability', 'Processing Integrity', 'Confidentiality', 'Privacy'].map(d => (
-                            <button key={d} onClick={() => setFilter(d)} className={`px-4 py-2 rounded-full text-xs font-bold transition ${filter === d ? 'bg-blue-900 text-white' : 'bg-white text-slate-600 border'}`}>
-                                {d}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Practice Table */}
-                    <div className="practice-card overflow-hidden">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-slate-50 border-b border-slate-200">
-                                    <th className="p-4 text-xs font-bold uppercase text-slate-500">Criteria ID</th>
-                                    <th className="p-4 text-xs font-bold uppercase text-slate-500 w-1/3">Requirement</th>
-                                    <th className="p-4 text-xs font-bold uppercase text-slate-500">Audit Status</th>
-                                    <th className="p-4 text-xs font-bold uppercase text-slate-500">Evidence</th>
-                                    <th className="p-4 text-xs font-bold uppercase text-slate-500 text-center">Audit Result</th>
+                    {/* Audit Table */}
+                    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                        <table className="w-full text-left">
+                            <thead className="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th>Criteria</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Evidence</th>
+                                    <th className="text-center">Gap</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredControls.map(c => (
-                                    <tr key={c.id} className="control-row border-b border-slate-100 transition">
-                                        <td className="p-4 font-mono text-blue-600 font-bold text-sm">{c.controlID}</td>
-                                        <td className="p-4">
-                                            <p className="text-sm font-semibold text-slate-800 mb-1">{c.controlDescription}</p>
-                                            <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded uppercase font-bold">{c.domain}</span>
-                                        </td>
-                                        <td className="p-4">
-                                            <select 
-                                                value={c.currentStatus} 
-                                                onChange={(e) => updateAudit(c.id, 'currentStatus', e.target.value)}
-                                                className="bg-white border border-slate-300 rounded p-1 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                                            >
-                                                <option value="No">Missing</option>
-                                                <option value="Yes">In Place</option>
-                                            </select>
-                                        </td>
-                                        <td className="p-4">
-                                            <button 
-                                                onClick={() => updateAudit(c.id, 'evidenceAvailable', !c.evidenceAvailable)}
-                                                className={`text-xs px-3 py-1.5 rounded-md font-bold transition ${c.evidenceAvailable ? 'bg-blue-100 text-blue-700' : 'bg-slate-200 text-slate-500'}`}
-                                            >
-                                                {c.evidenceAvailable ? 'Attached' : 'No File'}
-                                            </button>
-                                        </td>
-                                        <td className="p-4 text-center">
-                                            <span className={`status-badge ${c.gapIdentified ? 'gap-alert' : 'pass-check'}`}>
-                                                {c.gapIdentified ? '⚠️ Gap' : '✅ Pass'}
-                                            </span>
-                                        </td>
-                                    </tr>
+                                {controls.map(c => (
+                                    <ControlRow key={c.id} control={c} onSave={handleRowUpdate} />
                                 ))}
                             </tbody>
                         </table>
                     </div>
+                    
+                    <footer className="mt-8 text-center text-slate-400 text-xs">
+                        &copy; 2024 Yeshura GRC Lab • Theory to Practice Framework
+                    </footer>
                 </div>
             );
         }
