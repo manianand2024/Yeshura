@@ -23,14 +23,27 @@
         const { useState, useEffect } = React;
 
         // NIST AI RMF 1.0 & ISO 42001 Mapped Data
-        const initialAIControls = [
-            { id: '1', framework: 'NIST RMF', category: 'GOVERN', code: 'GOVERN 1.1', requirement: 'Legal & Regulatory Compliance', desc: 'Policies ensure AI systems comply with applicable laws.', status: 'No', evidence: false, gap: true },
-            { id: '2', framework: 'ISO 42001', category: 'PLAN', code: 'A.5.2', requirement: 'AI System Impact Assessment', desc: 'Assess potential consequences on individuals and society.', status: 'No', evidence: false, gap: true },
-            { id: '3', framework: 'NIST RMF', category: 'MAP', code: 'MAP 1.1', requirement: 'Contextual Prioritization', desc: 'Document intended use and scientific integrity of the AI.', status: 'No', evidence: false, gap: true },
-            { id: '4', framework: 'ISO 42001', category: 'DATA', code: 'A.7.4', requirement: 'Data Quality for AI', desc: 'Requirements for data representativeness to minimize bias.', status: 'No', evidence: false, gap: true },
-            { id: '5', framework: 'NIST RMF', category: 'MEASURE', code: 'MEASURE 2.1', requirement: 'Trustworthiness Metrics', desc: 'Identify metrics for fairness, safety, and security.', status: 'No', evidence: false, gap: true },
-            { id: '6', framework: 'ISO 42001', category: 'USER', code: 'A.8.2', requirement: 'Transparency for Users', desc: 'Explain AI functionality, limitations, and usage to users.', status: 'No', evidence: false, gap: true }
-        ];
+      const initialAIControls = [
+  // --- NIST AI RMF CORE FUNCTIONS ---
+  { id: '1', framework: 'NIST RMF', category: 'GOVERN', code: 'GOVERN 1.1', requirement: 'Legal & Regulatory Compliance', desc: 'Policies ensure AI systems comply with applicable laws and ethical standards.', status: 'No', evidence: false, gap: true },
+  { id: '2', framework: 'NIST RMF', category: 'GOVERN', code: 'GOVERN 1.2', requirement: 'Accountability Structures', desc: 'Roles and responsibilities for AI risk management are clearly defined and documented.', status: 'No', evidence: false, gap: true },
+  { id: '3', framework: 'NIST RMF', category: 'MAP', code: 'MAP 1.1', requirement: 'Contextual Prioritization', desc: 'Document intended use and potential positive/negative impacts of the AI system.', status: 'No', evidence: false, gap: true },
+  { id: '4', framework: 'NIST RMF', category: 'MAP', code: 'MAP 1.5', requirement: 'Scientific Integrity', desc: 'The scientific basis and limitations of the AI model are identified and recorded.', status: 'No', evidence: false, gap: true },
+  { id: '5', framework: 'NIST RMF', category: 'MEASURE', code: 'MEASURE 1.1', requirement: 'Trustworthiness Metrics', desc: 'Establish quantitative and qualitative metrics for fairness, safety, and security.', status: 'No', evidence: false, gap: true },
+  { id: '6', framework: 'NIST RMF', category: 'MEASURE', code: 'MEASURE 2.1', requirement: 'Independent Evaluation', desc: 'AI systems are regularly assessed by parties not involved in their development.', status: 'No', evidence: false, gap: true },
+  { id: '7', framework: 'NIST RMF', category: 'MANAGE', code: 'MANAGE 1.1', requirement: 'Risk Response Execution', desc: 'Identify and prioritize AI risks for action according to risk tolerance.', status: 'No', evidence: false, gap: true },
+  { id: '8', framework: 'NIST RMF', category: 'MANAGE', code: 'MANAGE 1.3', requirement: 'Third-Party Risk Management', desc: 'Mitigate risks from third-party AI data, models, or software components.', status: 'No', evidence: false, gap: true },
+
+  // --- ISO/IEC 42001 ANNEX A CONTROLS ---
+  { id: '9', framework: 'ISO 42001', category: 'PLAN', code: 'A.5.2', requirement: 'AI System Impact Assessment', desc: 'Assess potential consequences on individuals, society, and ethical boundaries.', status: 'No', evidence: false, gap: true },
+  { id: '10', framework: 'ISO 42001', category: 'DATA', code: 'A.7.2', requirement: 'Data Governance for AI', desc: 'Establish processes for data acquisition, labeling, and quality management.', status: 'No', evidence: false, gap: true },
+  { id: '11', framework: 'ISO 42001', category: 'DATA', code: 'A.7.4', requirement: 'Data Quality & Bias', desc: 'Define requirements for data representativeness to minimize algorithmic bias.', status: 'No', evidence: false, gap: true },
+  { id: '12', framework: 'ISO 42001', category: 'USER', code: 'A.8.2', requirement: 'Transparency & Explainability', desc: 'Provide documentation explaining how AI reaches decisions or specific outputs.', status: 'No', evidence: false, gap: true },
+  { id: '13', framework: 'ISO 42001', category: 'LIFE', code: 'A.10.1', requirement: 'AI Life Cycle Management', desc: 'Maintain governance from design through retirement or decommissioning.', status: 'No', evidence: false, gap: true },
+  { id: '14', framework: 'ISO 42001', category: 'LIFE', code: 'A.10.2', requirement: 'Supply Chain Accountability', desc: 'Define responsibilities when using external AI models or service providers.', status: 'No', evidence: false, gap: true },
+  { id: '15', framework: 'ISO 42001', category: 'MONITOR', code: 'A.10.4', requirement: 'Logging & Monitoring', desc: 'Maintain audit logs of AI performance and decisions for forensic review.', status: 'No', evidence: false, gap: true },
+  { id: '16', framework: 'ISO 42001', category: 'MONITOR', code: 'A.10.6', requirement: 'AI Incident Response', desc: 'Procedures for handling AI failures like model drift or adversarial attacks.', status: 'No', evidence: false, gap: true }
+];
 
         const ControlRow = ({ control, onSave }) => {
             const [local, setLocal] = useState({...control});
